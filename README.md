@@ -1,4 +1,4 @@
-# Fleet Rentals
+# Tress Enterprise — Fleet Rental Management
 
 Professional fleet rental management — inspired by [Rentgine](https://www.rentgine.net/en/), built for ease of use.
 
