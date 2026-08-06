@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'business')",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'business')"
+      }
+    },
+    "vehicles": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'business'"
+    },
+    "rentals": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "customers": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "chats": {
+      "$chatId": {
+        ".read": "auth != null && (data.child('participants').child(auth.uid).exists() || root.child('users').child(auth.uid).child('role').val() === 'business')",
+        ".write": "auth != null && (data.child('participants').child(auth.uid).exists() || root.child('users').child(auth.uid).child('role').val() === 'business')",
+        "messages": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+    "tasks": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'business'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'business'"
+    },
+    "alerts": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'business'",
+      ".write": "auth != null"
+    },
+    "locations": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'business')",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "issues": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "fleetrentals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fleet rental management — business dashboard, customer app, Firebase + Cloudflare",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:business": "npm run dev -w @fleetrentals/business",
+    "dev:customer": "npm run dev -w @fleetrentals/customer",
+    "build:business": "npm run build -w @fleetrentals/business",
+    "build:customer": "npm run build -w @fleetrentals/customer",
+    "build": "npm run build:business && npm run build:customer",
+    "deploy:firebase": "firebase deploy",
+    "deploy:pages": "npm run build && gh-pages -d apps/business/dist -o apps/customer/dist"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.2.0"
+  }
+}
