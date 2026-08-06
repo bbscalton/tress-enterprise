@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "614243852847",
+    "firebase_url": "https://fleetrentals-app-default-rtdb.firebaseio.com",
+    "project_id": "fleetrentals-app",
+    "storage_bucket": "fleetrentals-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614243852847:android:e22a23b67c6e0724515cda",
+        "android_client_info": {
+          "package_name": "com.tressenterprise.business"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "614243852847-7amqn8i31kj5ugc2jebu4h758kds0drt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqb5-VOjDC6pKmToKK8k4oPHs9na6aUK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "614243852847-7amqn8i31kj5ugc2jebu4h758kds0drt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -11,3 +11,10 @@ build/
 .dev.vars
 coverage/
 *.local
+
+# Android / Capacitor build artifacts
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/capacitor-cordova-android-plugins/build/
+**/android/local.properties

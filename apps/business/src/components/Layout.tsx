@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { ApkDownloadCard } from './ApkDownloadCard';
 
 const nav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -55,6 +56,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </NavLink>
           ))}
         </nav>
+        <div className="px-4 pb-2">
+          <ApkDownloadCard compact />
+        </div>
         <div className="p-4 border-t border-slate-700">
           <div className="flex items-center gap-3 mb-3">
             {user?.photoURL ? (
@@ -109,6 +113,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         )}
 
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
+          <div className="mb-4 lg:hidden">
+            <ApkDownloadCard compact />
+          </div>
           {children}
         </main>
 

@@ -11,8 +11,10 @@ import { ChatPage } from './pages/ChatPage';
 import { TasksPage } from './pages/TasksPage';
 import { useAlertMonitor } from './hooks/useAlertMonitor';
 import { initFirebase } from '@fleetrentals/shared';
+import { initNativePush } from './lib/nativePush';
 
 initFirebase();
+initNativePush();
 
 function ProtectedRoutes() {
   const { user, loading } = useAuth();

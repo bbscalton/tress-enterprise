@@ -24,7 +24,11 @@ export default {
         return new Response('Not found', { status: 404, headers: corsHeaders(corsOrigin) });
       }
       const headers = new Headers(corsHeaders(corsOrigin));
-      headers.set('Content-Type', object.httpMetadata?.contentType ?? 'application/octet-stream');
+      const contentType = object.httpMetadata?.contentType ?? 'application/octet-stream';
+      headers.set('Content-Type', contentType);
+      if (path.endsWith('.apk')) {
+        headers.set('Content-Disposition', 'attachment; filename="tress-enterprise-business.apk"');
+      }
       return new Response(object.body, { headers });
     }
 

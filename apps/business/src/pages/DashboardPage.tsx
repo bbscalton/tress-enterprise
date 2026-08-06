@@ -22,6 +22,7 @@ import {
   RENTAL_STATUS_COLORS,
 } from '@fleetrentals/shared';
 import { stopAggressiveAlarm } from '../lib/alerts';
+import { ApkDownloadCard } from '../components/ApkDownloadCard';
 
 export function DashboardPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -63,6 +64,8 @@ export function DashboardPage() {
         <h2 className="text-2xl font-bold">Dashboard</h2>
         <p className="text-slate-400">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
       </div>
+
+      <ApkDownloadCard />
 
       {/* Urgent alerts banner */}
       {unackedAlerts.length > 0 && (
