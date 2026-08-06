@@ -43,7 +43,7 @@ export default {
       return new Response('Deleted', { headers: corsHeaders(corsOrigin) });
     }
 
-    return new Response('Fleet Rentals Storage API', { headers: corsHeaders(corsOrigin) });
+    return new Response('Tress Enterprise Storage API (Cloudflare R2)', { headers: corsHeaders(corsOrigin) });
   },
 };
 

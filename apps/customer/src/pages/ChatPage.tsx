@@ -5,6 +5,8 @@ import {
   subscribeChatMessages,
   sendMessage,
   createChat,
+  uploadFileToR2,
+  uploadBlobToR2,
   type Chat,
   type ChatMessage,
 } from '@fleetrentals/shared';
@@ -76,18 +78,19 @@ export function ChatPage() {
     if (!file || !user) return;
     const c = chat ?? await ensureChat();
     if (!c) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
+    try {
+      const url = await uploadFileToR2(`chat/${c.id}`, file, user.uid);
       await sendMessage(c.id, {
         senderId: user.uid,
         senderName: user.displayName,
         type: 'image',
-        mediaUrl: reader.result as string,
+        mediaUrl: url,
         createdAt: Date.now(),
         read: false,
       });
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      alert('Failed to upload image');
+    }
   };
 
   const startRecording = async () => {
@@ -98,21 +101,22 @@ export function ChatPage() {
       recorder.ondataavailable = (e) => chunksRef.current.push(e.data);
       recorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const c = chat ?? await ensureChat();
-          if (!c || !user) return;
+        const c = chat ?? await ensureChat();
+        if (!c || !user) return;
+        try {
+          const url = await uploadBlobToR2(`chat/${c.id}`, blob, 'webm', user.uid);
           await sendMessage(c.id, {
             senderId: user.uid,
             senderName: user.displayName,
             type: 'voice',
-            mediaUrl: reader.result as string,
+            mediaUrl: url,
             duration: 0,
             createdAt: Date.now(),
             read: false,
           });
-        };
-        reader.readAsDataURL(blob);
+        } catch {
+          alert('Failed to upload voice note');
+        }
         stream.getTracks().forEach((t) => t.stop());
       };
       mediaRecorderRef.current = recorder;

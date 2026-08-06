@@ -4,6 +4,7 @@ import {
   getCustomerRentals,
   subscribeIssues,
   createIssue,
+  uploadFileToR2,
   type Rental,
   type Issue,
 } from '@fleetrentals/shared';
@@ -16,7 +17,8 @@ export function IssuesPage() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -33,14 +35,17 @@ export function IssuesPage() {
     const files = e.target.files;
     if (!files) return;
     Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => setPhotos((prev) => [...prev, reader.result as string]);
-      reader.readAsDataURL(file);
+      setPhotoFiles((prev) => [...prev, file]);
+      setPhotoPreviews((prev) => [...prev, URL.createObjectURL(file)]);
     });
   };
 
   const handleSubmit = async () => {
     if (!title.trim() || !user || !rental) return;
+    const photoUrls = photoFiles.length > 0
+      ? await Promise.all(photoFiles.map((f) => uploadFileToR2(`issues/${rental.id}`, f, user.uid)))
+      : [];
+
     await createIssue({
       rentalId: rental.id,
       customerId: user.uid,
@@ -48,14 +53,15 @@ export function IssuesPage() {
       vehicleId: rental.vehicleId,
       title: title.trim(),
       description: description.trim(),
-      photos,
+      photos: photoUrls,
       status: 'open',
       createdAt: Date.now(),
     });
     setShowForm(false);
     setTitle('');
     setDescription('');
-    setPhotos([]);
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
   };
 
   return (
@@ -85,7 +91,7 @@ export function IssuesPage() {
           <div>
             <label className="label">Photos</label>
             <div className="grid grid-cols-3 gap-2 mb-2">
-              {photos.map((p, i) => (
+              {photoPreviews.map((p, i) => (
                 <img key={i} src={p} className="w-full h-20 object-cover rounded-lg" alt="" />
               ))}
             </div>

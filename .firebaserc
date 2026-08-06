@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "fleetrentals-app"
+  },
+  "targets": {
+    "fleetrentals-app": {
+      "hosting": {
+        "business": ["fleetrentals-app"],
+        "customer": ["tress-enterprise-customer"]
+      }
+    }
   }
 }

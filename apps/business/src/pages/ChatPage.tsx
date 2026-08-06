@@ -4,6 +4,7 @@ import {
   subscribeChats,
   subscribeChatMessages,
   sendMessage,
+  uploadFileToR2,
   type Chat,
   type ChatMessage,
 } from '@fleetrentals/shared';
@@ -43,18 +44,19 @@ export function ChatPage() {
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedChat || !user) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
+    try {
+      const url = await uploadFileToR2(`chat/${selectedChat.id}`, file, user.uid);
       await sendMessage(selectedChat.id, {
         senderId: user.uid,
         senderName: user.displayName,
         type: 'image',
-        mediaUrl: reader.result as string,
+        mediaUrl: url,
         createdAt: Date.now(),
         read: false,
       });
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      alert('Failed to upload image');
+    }
   };
 
   return (
@@ -106,7 +108,9 @@ export function ChatPage() {
                       {m.type === 'image' && m.mediaUrl && (
                         <img src={m.mediaUrl} className="max-w-full rounded-lg" alt="Photo" />
                       )}
-                      {m.type === 'voice' && <p>🎤 Voice message</p>}
+                      {m.type === 'voice' && m.mediaUrl && (
+                        <audio controls src={m.mediaUrl} className="max-w-full" />
+                      )}
                       <p className="text-[10px] opacity-60 mt-1">
                         {new Date(m.createdAt).toLocaleTimeString()}
                       </p>

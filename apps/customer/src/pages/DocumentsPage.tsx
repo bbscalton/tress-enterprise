@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Upload, FileText, CheckCircle } from 'lucide-react';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { initFirebase, setUser, getUser, upsertCustomer } from '@fleetrentals/shared';
+import { setUser, getUser, upsertCustomer, uploadFileToR2 } from '@fleetrentals/shared';
 import { useAuth } from '../context/AuthContext';
 
 export function DocumentsPage() {
@@ -24,10 +23,7 @@ export function DocumentsPage() {
     if (!file || !user) return;
     setUploading(true);
     try {
-      const { storage } = initFirebase();
-      const storageRef = ref(storage, `licenses/${user.uid}/${Date.now()}.jpg`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const url = await uploadFileToR2('licenses', file, user.uid);
       setLicenseUrl(url);
 
       await setUser({
@@ -52,6 +48,9 @@ export function DocumentsPage() {
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error(err);
+      alert('Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -77,7 +76,7 @@ export function DocumentsPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold">Documents</h2>
-        <p className="text-slate-400 text-sm">Upload your driver's license and manage rental documents</p>
+        <p className="text-slate-400 text-sm">Upload your driver's license (stored securely on Cloudflare R2)</p>
       </div>
 
       {saved && (

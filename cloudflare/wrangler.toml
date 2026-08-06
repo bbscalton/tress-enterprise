@@ -7,4 +7,4 @@ binding = "BUCKET"
 bucket_name = "fleetrentals-files"
 
 [vars]
-ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:5174"
+ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:5174,https://fleetrentals-app.web.app,https://tress-enterprise-customer.web.app,https://bbscalton.github.io"

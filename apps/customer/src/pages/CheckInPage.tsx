@@ -4,6 +4,7 @@ import {
   getCustomerRentals,
   updateRental,
   subscribeVehicles,
+  uploadFileToR2,
   type Rental,
   type Vehicle,
 } from '@fleetrentals/shared';
@@ -13,7 +14,8 @@ export function CheckInPage() {
   const { user } = useAuth();
   const [rental, setRental] = useState<Rental | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [signed, setSigned] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -24,7 +26,7 @@ export function CheckInPage() {
       setRental(active ?? null);
       if (active?.checkInAt) setDone(true);
       if (active?.agreementSigned) setSigned(true);
-      if (active?.pickupPhotos) setPhotos(active.pickupPhotos);
+      if (active?.pickupPhotos) setPhotoPreviews(active.pickupPhotos);
     });
     return subscribeVehicles((v) => {
       if (rental) setVehicle(v.find((ve) => ve.id === rental.vehicleId) ?? null);
@@ -40,16 +42,20 @@ export function CheckInPage() {
     const files = e.target.files;
     if (!files) return;
     Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => setPhotos((prev) => [...prev, reader.result as string]);
-      reader.readAsDataURL(file);
+      setPhotoFiles((prev) => [...prev, file]);
+      setPhotoPreviews((prev) => [...prev, URL.createObjectURL(file)]);
     });
   };
 
   const handleCheckIn = async () => {
-    if (!rental || photos.length === 0) return;
+    if (!rental || !user || photoPreviews.length === 0) return;
+    const uploaded = await Promise.all(
+      photoFiles.map((file) => uploadFileToR2(`rentals/${rental.id}/pickup`, file, user.uid))
+    );
+    const photoUrls = uploaded.length > 0 ? uploaded : photoPreviews;
+
     await updateRental(rental.id, {
-      pickupPhotos: photos,
+      pickupPhotos: photoUrls,
       checkInAt: Date.now(),
       agreementSigned: signed,
     });
@@ -91,7 +97,7 @@ export function CheckInPage() {
           Take photos of the vehicle condition before you drive (all angles recommended).
         </p>
         <div className="grid grid-cols-3 gap-2 mb-4">
-          {photos.map((p, i) => (
+          {photoPreviews.map((p, i) => (
             <img key={i} src={p} className="w-full h-24 object-cover rounded-xl" alt={`Photo ${i + 1}`} />
           ))}
         </div>
@@ -120,7 +126,7 @@ export function CheckInPage() {
 
       <button
         onClick={handleCheckIn}
-        disabled={photos.length === 0 || !signed}
+        disabled={photoPreviews.length === 0 || !signed}
         className="btn-primary w-full flex items-center justify-center gap-2"
       >
         <CheckCircle size={20} /> Complete Check-In
