@@ -7,7 +7,7 @@
       }
     },
     "vehicles": {
-      ".read": "auth != null",
+      ".read": true,
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'business'"
     },
     "rentals": {
@@ -45,6 +45,12 @@
     "issues": {
       ".read": "auth != null",
       ".write": "auth != null"
+    },
+    "bookingRequests": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'business'",
+      "$id": {
+        ".write": "!data.exists() && newData.hasChildren(['customerName', 'email', 'vehicleId', 'startDate', 'endDate', 'status', 'createdAt'])"
+      }
     }
   }
 }

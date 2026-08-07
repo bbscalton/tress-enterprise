@@ -55,6 +55,48 @@ export interface Rental {
   checkOutAt?: number;
   notes?: string;
   createdAt: number;
+  /** Digital rental agreement fields (Tress Enterprise form) */
+  agreement?: RentalAgreement;
+}
+
+export interface RentalAgreement {
+  agreementNumber?: string;
+  dob?: string;
+  homeAddress?: string;
+  homePhone?: string;
+  localAddress?: string;
+  localPhone?: string;
+  licenseNumber?: string;
+  licenseIssued?: string;
+  permitNumber?: string;
+  permitIssued?: string;
+  additionalDrivers?: string;
+  paymentMethod?: 'cash' | 'credit' | 'other';
+  ldwAccepted?: boolean;
+  ldwInitial?: string;
+  lateFeeInitial?: string;
+  unauthorizedInitial?: string;
+  liabilityInitial?: string;
+  fuelOutLevel?: number;
+  fuelInLevel?: number;
+  inventory?: Record<string, boolean>;
+  hirerSignature?: string;
+  signedAt?: number;
+}
+
+export interface BookingRequest {
+  id: string;
+  customerName: string;
+  email: string;
+  phone?: string;
+  vehicleId: string;
+  startDate: string;
+  endDate: string;
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
+  status: 'pending' | 'approved' | 'declined';
+  createdAt: number;
 }
 
 export interface Customer {

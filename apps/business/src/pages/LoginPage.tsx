@@ -23,7 +23,7 @@ export function LoginPage() {
           </svg>
           Sign in with Google
         </button>
-        <p className="text-xs text-slate-500 mt-6">Business owners and fleet managers only</p>
+        <p className="text-xs text-slate-500 mt-6">On phone or Android app, sign-in may redirect to Google — return here after approving.</p>
       </div>
     </div>
   );

@@ -13,11 +13,13 @@ import {
   subscribeRentals,
   subscribeAlerts,
   subscribeIssues,
+  subscribeBookingRequests,
   acknowledgeAlert,
   type Vehicle,
   type Rental,
   type Alert,
   type Issue,
+  type BookingRequest,
   VEHICLE_STATUS_COLORS,
   RENTAL_STATUS_COLORS,
 } from '@fleetrentals/shared';
@@ -29,6 +31,7 @@ export function DashboardPage() {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>([]);
 
   useEffect(() => {
     return subscribeVehicles(setVehicles);
@@ -42,6 +45,9 @@ export function DashboardPage() {
   useEffect(() => {
     return subscribeIssues(setIssues);
   }, []);
+  useEffect(() => {
+    return subscribeBookingRequests(setBookingRequests);
+  }, []);
 
   const activeRentals = rentals.filter((r) => r.status === 'active' || r.status === 'overdue');
   const dueToday = rentals.filter((r) => {
@@ -50,6 +56,7 @@ export function DashboardPage() {
   });
   const unackedAlerts = alerts.filter((a) => !a.acknowledged);
   const openIssues = issues.filter((i) => i.status === 'open');
+  const pendingBookings = bookingRequests.filter((b) => b.status === 'pending');
 
   const stats = [
     { label: 'Total Vehicles', value: vehicles.length, icon: Car, color: 'text-blue-400' },
@@ -66,6 +73,20 @@ export function DashboardPage() {
       </div>
 
       <ApkDownloadCard />
+
+      {pendingBookings.length > 0 && (
+        <div className="card border border-brand-600/50">
+          <h3 className="font-bold mb-3">New online bookings ({pendingBookings.length})</h3>
+          <div className="space-y-2">
+            {pendingBookings.slice(0, 5).map((b) => (
+              <div key={b.id} className="flex justify-between py-2 border-b border-slate-700 last:border-0 text-sm">
+                <span>{b.customerName} · {b.startDate} → {b.endDate}</span>
+                <a href="https://tress-enterprise-booking.web.app" className="text-brand-400">View</a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Urgent alerts banner */}
       {unackedAlerts.length > 0 && (

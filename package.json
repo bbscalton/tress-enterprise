@@ -10,9 +10,11 @@
   "scripts": {
     "dev:business": "npm run dev -w @fleetrentals/business",
     "dev:customer": "npm run dev -w @fleetrentals/customer",
+    "dev:booking": "npm run dev -w @fleetrentals/booking",
     "build:business": "npm run build -w @fleetrentals/business",
     "build:customer": "npm run build -w @fleetrentals/customer",
-    "build": "npm run build:business && npm run build:customer",
+    "build:booking": "npm run build -w @fleetrentals/booking",
+    "build": "npm run build:business && npm run build:customer && npm run build:booking",
     "deploy:firebase": "firebase deploy",
     "deploy:pages": "npm run build && gh-pages -d apps/business/dist -o apps/customer/dist"
   },

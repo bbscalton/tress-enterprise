@@ -7,8 +7,10 @@ import {
   uploadFileToR2,
   type Rental,
   type Vehicle,
+  type RentalAgreement,
 } from '@fleetrentals/shared';
 import { useAuth } from '../context/AuthContext';
+import { RentalAgreementForm } from '../components/RentalAgreementForm';
 
 export function CheckInPage() {
   const { user } = useAuth();
@@ -16,6 +18,7 @@ export function CheckInPage() {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [agreement, setAgreement] = useState<RentalAgreement>({});
   const [signed, setSigned] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -26,6 +29,7 @@ export function CheckInPage() {
       setRental(active ?? null);
       if (active?.checkInAt) setDone(true);
       if (active?.agreementSigned) setSigned(true);
+      if (active?.agreement) setAgreement(active.agreement);
       if (active?.pickupPhotos) setPhotoPreviews(active.pickupPhotos);
     });
     return subscribeVehicles((v) => {
@@ -47,8 +51,14 @@ export function CheckInPage() {
     });
   };
 
+  const handleSignAgreement = () => {
+    if (!agreement.hirerSignature?.trim()) return;
+    setAgreement((a) => ({ ...a, signedAt: Date.now() }));
+    setSigned(true);
+  };
+
   const handleCheckIn = async () => {
-    if (!rental || !user || photoPreviews.length === 0) return;
+    if (!rental || !user || photoPreviews.length === 0 || !signed) return;
     const uploaded = await Promise.all(
       photoFiles.map((file) => uploadFileToR2(`rentals/${rental.id}/pickup`, file, user.uid))
     );
@@ -57,7 +67,8 @@ export function CheckInPage() {
     await updateRental(rental.id, {
       pickupPhotos: photoUrls,
       checkInAt: Date.now(),
-      agreementSigned: signed,
+      agreementSigned: true,
+      agreement: { ...agreement, signedAt: agreement.signedAt ?? Date.now() },
     });
     setDone(true);
   };
@@ -66,6 +77,9 @@ export function CheckInPage() {
     return (
       <div className="card text-center py-12">
         <p className="text-slate-400">No active rental to check in</p>
+        <p className="text-sm text-slate-500 mt-2">
+          <a href="https://tress-enterprise-booking.web.app/book" className="text-brand-500">Book a vehicle online</a>
+        </p>
       </div>
     );
   }
@@ -75,7 +89,7 @@ export function CheckInPage() {
       <div className="card text-center py-12">
         <CheckCircle size={48} className="mx-auto text-green-400 mb-4" />
         <h2 className="text-xl font-bold mb-2">Check-in Complete!</h2>
-        <p className="text-slate-400">Your vehicle pickup has been recorded.</p>
+        <p className="text-slate-400">Your vehicle pickup and agreement have been recorded.</p>
       </div>
     );
   }
@@ -108,21 +122,13 @@ export function CheckInPage() {
         </label>
       </div>
 
-      <div className="card">
-        <h3 className="font-bold mb-3">Rental Agreement</h3>
-        <p className="text-sm text-slate-400 mb-4">
-          By checking this box, you agree to the rental terms and conditions.
-        </p>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={signed}
-            onChange={(e) => setSigned(e.target.checked)}
-            className="w-5 h-5 rounded accent-brand-500"
-          />
-          <span>I agree to the rental agreement terms</span>
-        </label>
-      </div>
+      <RentalAgreementForm
+        value={agreement}
+        onChange={setAgreement}
+        customerName={user?.displayName}
+        onSign={handleSignAgreement}
+        signed={signed}
+      />
 
       <button
         onClick={handleCheckIn}

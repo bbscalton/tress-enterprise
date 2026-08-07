@@ -23,6 +23,7 @@ import type {
   Alert,
   LocationUpdate,
   Issue,
+  BookingRequest,
 } from './types';
 
 function dbRef(path: string) {
@@ -186,4 +187,21 @@ export async function getCustomerRentals(customerId: string): Promise<Rental[]> 
   const snap = await get(query(dbRef('rentals'), orderByChild('customerId'), equalTo(customerId)));
   if (!snap.exists()) return [];
   return Object.values(snap.val());
+}
+
+export function subscribeBookingRequests(callback: (requests: BookingRequest[]) => void): Unsubscribe {
+  return onValue(dbRef('bookingRequests'), (snap) => {
+    const data = snap.val() ?? {};
+    callback(Object.values(data).sort((a, b) => b.createdAt - a.createdAt));
+  });
+}
+
+export async function createBookingRequest(request: Omit<BookingRequest, 'id'>) {
+  const newRef = push(dbRef('bookingRequests'));
+  await set(newRef, { ...request, id: newRef.key! });
+  return newRef.key!;
+}
+
+export async function updateBookingRequest(id: string, data: Partial<BookingRequest>) {
+  await update(dbRef(`bookingRequests/${id}`), data);
 }

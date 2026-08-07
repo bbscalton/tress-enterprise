@@ -6,7 +6,8 @@
     "fleetrentals-app": {
       "hosting": {
         "business": ["fleetrentals-app"],
-        "customer": ["tress-enterprise-customer"]
+        "customer": ["tress-enterprise-customer"],
+        "booking": ["tress-enterprise-booking"]
       }
     }
   }

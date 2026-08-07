@@ -1,12 +1,18 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import {
   onAuthStateChanged,
-  signInWithPopup,
   signOut as firebaseSignOut,
-  GoogleAuthProvider,
   type User as FirebaseUser,
 } from 'firebase/auth';
-import { initFirebase, getUser, setUser, upsertCustomer, type User } from '@fleetrentals/shared';
+import {
+  initFirebase,
+  getUser,
+  setUser,
+  upsertCustomer,
+  signInWithGoogle as googleSignIn,
+  completeGoogleRedirect,
+  type User,
+} from '@fleetrentals/shared';
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +31,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { auth } = initFirebase();
+    completeGoogleRedirect(auth).catch(() => {});
+
     return onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
@@ -57,8 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const { auth } = initFirebase();
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await googleSignIn(auth);
   };
 
   const signOut = async () => {
